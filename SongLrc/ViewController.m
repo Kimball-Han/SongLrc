@@ -14,6 +14,7 @@
 {
     ParsingLyrics *_parse;
     AVAudioPlayer *_audio;
+    __weak IBOutlet UITableView *tableview;
 }
 @end
 
@@ -41,8 +42,6 @@
 }
 -(void)nslogLrcxin
 {
-    
-    
     static NSInteger index=-1;
     NSInteger s=[_parse returnSongLrcAccordingToTime:_audio.currentTime];
     if (s!=index) {
