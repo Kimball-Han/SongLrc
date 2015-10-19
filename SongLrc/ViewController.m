@@ -10,7 +10,8 @@
 #import "ParsingLyrics.h"
 #import "LrcModel.h"
 #import <AVFoundation/AVFoundation.h>
-@interface ViewController ()
+
+@interface ViewController ()<UITableViewDataSource,UITableViewDelegate>
 {
     ParsingLyrics *_parse;
     AVAudioPlayer *_audio;
@@ -23,17 +24,44 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [self play];
+ 
     
-    
+    tableview.delegate=self;
+    tableview.dataSource=self;
+    [tableview registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cellId"];
     
 }
--(void)play
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    return 2;
+}
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:@"cellId"];
+    if (indexPath.row==0) {
+        cell.textLabel.text=@"贝加尔湖畔";
+        
+    }else{
+        cell.textLabel.text=@"是否";
+    }
+    return cell;
+    
+}
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row==0) {
+        [self play:@"贝加尔湖畔"];
+    }else{
+         [self play:@"是否"];
+    }
+}
+-(void)play:(NSString *)name
+{
+    _parse=nil;
     _parse=[[ParsingLyrics alloc] init];
-    [_parse readSongLrcsByFilepath:[[NSBundle mainBundle]pathForResource:@"贝加尔湖畔" ofType:@"lrc" ]];
+    [_parse readSongLrcsByFilepath:[[NSBundle mainBundle]pathForResource:name ofType:@"lrc" ]];
     [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(nslogLrcxin) userInfo:self repeats:YES];
-    NSString *str=[[NSBundle mainBundle] pathForResource:@"贝加尔湖畔" ofType:@"mp3" ];
+    NSString *str=[[NSBundle mainBundle] pathForResource:name ofType:@"mp3" ];
     NSURL *url= [NSURL fileURLWithPath:str];
     _audio=[[AVAudioPlayer alloc] initWithContentsOfURL:url error:nil];
     [_audio prepareToPlay];
@@ -42,14 +70,14 @@
 }
 -(void)nslogLrcxin
 {
-    static NSInteger index=-1;
+    static NSString *ss=nil;;
     NSInteger s=[_parse returnSongLrcAccordingToTime:_audio.currentTime];
-    if (s!=index) {
-        index=s;
+
         LrcModel *m=_parse.dataArr[s];
-        NSLog(@"%@",m.lrcstr);
-    } ;
-    
+    if (![ss isEqualToString:m.lrcstr]) {
+        ss=m.lrcstr;
+        NSLog(@"%f:%@",m.time,m.lrcstr);
+    }
     
     
 }

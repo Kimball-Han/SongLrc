@@ -11,6 +11,9 @@
 @implementation LrcModel
 
 
-
+-(BOOL)islitterThan:(LrcModel *)model
+{
+   return  self.time>model.time;
+}
 
 @end

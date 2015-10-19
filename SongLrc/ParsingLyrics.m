@@ -51,6 +51,7 @@
             }
         }
     }
+    [_dataArr sortUsingSelector:@selector(islitterThan:)];
     
 }
 
